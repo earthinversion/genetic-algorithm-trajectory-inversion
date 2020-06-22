@@ -1,0 +1,54 @@
+clear; close all; clc;
+format shortG;
+[x,y,z] = get_stations_coords();
+
+% 
+numrun = 5; %run for atleast 20 times to get reliable results
+
+viewBestFWindow = 1;
+
+all_vels = ones(numrun,1);
+all_x0 = ones(numrun,1);
+all_y0 = ones(numrun,1);
+all_gamma = ones(numrun,1);
+all_delta = ones(numrun,1);
+all_t0 = ones(numrun,1);
+
+for jj=1:numrun
+    fprintf("Run number : %d",jj);
+    close all;
+    %vel (in m/s), x0, y0, gamma, delta, t0
+    % t0 is relative to the observed arrival time
+    lower=[20*1000 100 20 250 50 -500]; % modify according to your needs
+    upper=[20*1000 150 30 350 100 500]; 
+    
+
+    if viewBestFWindow==1
+%         options = optimoptions('ga','PlotFcn', @gaplotbestf);
+        options = optimoptions('ga','PlotFcn', @gaplotbestf,'Display','iter','MaxGenerations',100);
+        res=ga(@(pp)fit_arrival_times(pp,x,y,z),6,[],[],[],[],lower,upper,[],options)
+    else
+        res=ga(@(pp)fit_arrival_times(pp,x,y,z),6,[],[],[],[],lower,upper,[]);
+    end
+
+
+    all_vels(jj) = res(1);
+    all_x0(jj) = res(2);
+    all_y0(jj) = res(3);
+    all_gamma(jj) = res(4);
+    all_delta(jj) = res(5);
+    all_t0(jj) = res(6);
+    clearvars res
+end
+output = table(all_vels,all_x0,all_y0,all_gamma,all_delta,all_t0)
+mean_vel= mean(output.all_vels);
+mean_x0= mean(output.all_x0);
+mean_y0= mean(output.all_y0);
+mean_gamma= mean(output.all_gamma);
+mean_delta= mean(output.all_delta);
+mean_t0= mean(output.all_t0);
+
+meanOutput = [mean_vel mean_x0 mean_y0 mean_gamma mean_delta mean_t0]
+
+
+
