@@ -16,6 +16,7 @@ run the main matlab script:
 
 ```ga_test.m```
 
+- add contents of `sac_matlab` dir to your MATLAB path
 - change the number of run `numrun` to considerably high value (e.g. 20) to estimate reliable output.
 - change the lower and upper limits of the trajectory parameters.
 - change the observed arrival times of the shockwaves, `dobs` in the script `fit_arrival_times.m`
